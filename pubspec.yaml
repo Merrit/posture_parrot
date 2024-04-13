@@ -1,0 +1,62 @@
+name: posture_parrot
+description: "A new Flutter project."
+
+# Prevent accidental publishing to pub.dev.
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  dbus: ^0.7.10
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.4
+  flutter_local_notifications: ^17.0.1
+  flutter_localizations:
+    sdk: flutter
+  freezed_annotation: ^2.4.1
+  helpers:
+    git:
+      url: https://github.com/Merrit/helpers.git
+      ref: 792c63d8dddaf89a3ead5a0c44e40f3a3e5ffae5
+  json_annotation: ^4.8.1
+  logger: ^2.0.2+1
+  path_provider: ^2.1.2
+  quiver: ^3.2.1
+  timezone: ^0.9.2
+  tray_manager: ^0.2.1
+  window_manager: ^0.3.8
+
+dev_dependencies:
+  build_runner: ^2.4.8
+  flutter_app_builder:
+    git:
+      url: https://github.com/Merrit/flutter_app_builder.git
+      ref: a70df0728d9d7d8fd528553ff7d88be01a789a38
+  flutter_lints: ^3.0.0
+  flutter_test:
+    sdk: flutter
+  freezed: ^2.4.7
+  json_serializable: ^6.7.1
+
+flutter:
+  uses-material-design: true
+
+  # Enable generation of localized Strings from arb files.
+  generate: true
+
+  assets:
+    # Add assets from the images directory to the application.
+    - assets/icons/
+
+flutter_app_builder:
+  app_display_name: "Posture Parrot"
+  author: "Merritt Codes"
+  identifier: codes.merritt.PostureParrot
+  msix_identity_name: 33694MerrittCodes.PostureParrot
+  msix_publisher: CN=0AA9BC0E-36DF-4B4F-BFF4-E300B746CB9D
+  msix_icon_path: assets\icons\codes.merritt.PostureParrot.png
+  msix_capabilities: internetClient
