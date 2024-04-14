@@ -1,7 +1,11 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:window_size/window_size.dart' as window_size;
+
+import '../logs/logging_manager.dart';
 
 class AppWindow {
   const AppWindow();
@@ -20,7 +24,7 @@ class AppWindow {
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.setAsFrameless();
       await windowManager.setSkipTaskbar(true);
-      await windowManager.maximize();
+      await _maximize();
     });
   }
 
@@ -69,5 +73,35 @@ class AppWindow {
     } else {
       await windowManager.show();
     }
+  }
+
+  /// Maximizes the window.
+  ///
+  /// We maximize the window so the break timer will be centered on the screen,
+  /// and the remainder of the window without decorations can provide a dimming effect.
+  Future<void> _maximize() async {
+    if (defaultTargetPlatform == TargetPlatform.linux) {
+      await windowManager.maximize();
+    } else {
+      await _maximizeForWindows();
+    }
+  }
+
+  /// Sets the window size to the same size as the screen's visible frame.
+  ///
+  /// This is a workaround for Windows, because `windowManager.maximize()`
+  /// causes the window to be shown when the app is started.
+  ///
+  /// This method doesn't work on Linux, because the resulting window won't
+  /// cover the entire screen for some reason.
+  Future<void> _maximizeForWindows() async {
+    final currentScreen = await window_size.getCurrentScreen();
+
+    if (currentScreen == null) {
+      log.e('Could not get the current screen');
+      return;
+    }
+
+    window_size.setWindowFrame(currentScreen.visibleFrame);
   }
 }
