@@ -44,7 +44,7 @@ jobs:
           path: artifacts
 
       - name: Create Development Release & Upload artifacts
-        uses: marvinpinto/action-automatic-releases@v1.2.1
+        uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
