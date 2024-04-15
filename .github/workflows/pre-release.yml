@@ -34,6 +34,9 @@ jobs:
     name: "Pre Release"
     needs: [call-build-linux, call-build-windows]
     runs-on: "ubuntu-latest"
+    permissions:
+      actions: write
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -44,4 +47,12 @@ jobs:
           path: artifacts
 
       - name: Create Development Release & Upload artifacts
-        run: bash ./.github/workflows/create_release.sh ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} ${{ github.sha }} ${{ github.workspace }}/artifacts
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            ${{ github.workspace }}/artifacts/linux-artifacts/*
+            ${{ github.workspace }}/artifacts/windows-artifacts/*
