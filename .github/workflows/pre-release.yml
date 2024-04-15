@@ -44,4 +44,4 @@ jobs:
           path: artifacts
 
       - name: Create Development Release & Upload artifacts
-        run: bash ./create_release.sh ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} ${{ github.sha }} ${{ github.workspace }}/artifacts
+        run: bash ./.github/workflows/create_release.sh ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} ${{ github.sha }} ${{ github.workspace }}/artifacts
