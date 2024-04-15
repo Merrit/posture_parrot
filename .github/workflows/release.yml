@@ -43,18 +43,4 @@ jobs:
           path: artifacts
 
       - name: Create Development Release & Upload artifacts
-        run: |
-          # Create a new release
-          release_id=$(curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -d "{\"
-          tag_name\": \"${{ github.ref }}\",
-          \"name\": \"Release ${{ github.ref }}\",
-          \"body\": \"\",
-          \"draft\": false,
-          \"prerelease\": false
-          }" "https://api.github.com/repos/${{ github.repository }}/releases" | jq -r '.id')
-
-          # Upload the artifacts
-          for file in $(find ${{ github.workspace }}/artifacts -type f); do
-            echo "Uploading $file"
-            curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@$file" "https://uploads.github.com/repos/${{ github.repository }}/releases/$release_id/assets?name=$(basename $file)"
-          done
+        run: bash ./create_release.sh ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} ${{ github.sha }} ${{ github.workspace }}/artifacts
