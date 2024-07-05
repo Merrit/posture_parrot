@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    Generator for metainfo & .desktop files: 
+    https://www.freedesktop.org/software/appstream/metainfocreator/#/
+-->
+<component type="desktop-application">
+  <id>codes.merritt.PostureParrot</id>
+  <name>Posture Parrot</name>
+  <summary>Reminds you to have good posture and take breaks</summary>
+  <developer_name>Merritt Codes</developer_name>
+  <url type="homepage">https://merritt.codes/postureparrot/</url>
+  <url type="donation">https://merritt.codes/support/</url>
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  <keywords>
+    <keyword>posture</keyword>
+    <keyword>reminder</keyword>
+    <keyword>reminders</keyword>
+    <keyword>health</keyword>
+    <keyword>breaks</keyword>
+    <keyword>stretch</keyword>
+    <keyword>stretching</keyword>
+    <keyword>exercise</keyword>
+    <keyword>exercises</keyword>
+    <keyword>eyes</keyword>
+    <keyword>ergonomics</keyword>
+    <keyword>ergonomic</keyword>
+    <keyword>work</keyword>
+    <keyword>office</keyword>
+    <keyword>desk</keyword>
+    <keyword>computer</keyword>
+    <keyword>monitor</keyword>
+    <keyword>keyboard</keyword>
+    <keyword>mouse</keyword>
+    <keyword>chair</keyword>
+    <keyword>standing</keyword>
+  </keywords>
+  <description>
+    <p>Do you sit at a computer all day? Posture Parrot is here to help! Posture Parrot is a desktop app that reminds you to have good posture and take breaks throughout the day. It's like having a personal trainer for your ergonomic health!</p>
+    <p>Here are some of the features that make Posture Parrot great:</p>
+    <ul>
+      <li>Break reminders: Set reminders to take breaks and stretch throughout the day.</li>
+      <li>Customizable reminders: Customize the frequency and timing of your reminders to fit your schedule.</li>
+      <!-- <li>Eye exercises: Get reminders to do eye exercises to reduce eye strain from staring at a screen all day.</li> -->
+      <li>Cross-platform: Available on Linux and Windows, so you can improve your posture no matter what operating system you use.</li>
+      <li>Open source: Posture Parrot is open source, so you can contribute to its development and help make it even better!</li>
+    </ul>
+    <p>Posture Parrot is ready to help you improve your posture and stay healthy. Download it today and start feeling better!</p>
+  </description>
+  <launchable type="desktop-id">codes.merritt.PostureParrot.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <caption>The main screen of Posture Parrot</caption>
+      <image>https://raw.githubusercontent.com/Merrit/posture_parrot_assets/main/images/screenshots/screenshot1.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Setting a break reminder</caption>
+      <image>https://raw.githubusercontent.com/Merrit/posture_parrot_assets/main/images/screenshots/screenshot3.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Getting a break reminder</caption>
+      <image>https://raw.githubusercontent.com/Merrit/posture_parrot_assets/main/images/screenshots/screenshot2.png</image>
+    </screenshot>
+    <!-- <screenshot>
+      <caption>Doing eye exercises</caption>
+      <image>https://raw.githubusercontent.com/Merrit/posture_parrot_assets/main/images/screenshots/screenshot4.png</image>
+    </screenshot> -->
+  </screenshots>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.1.0" date="2024-07-05">
+      <description/>
+    </release>
+  </releases>
+</component>

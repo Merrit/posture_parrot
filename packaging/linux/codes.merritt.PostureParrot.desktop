@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+
+Name=Posture Parrot
+Comment=Reminds you to have good posture and take breaks
+Categories=Utility;
+Keywords=posture;reminder;reminders;health;breaks;stretch;stretching;exercise;exercises;eyes;ergonomics;ergonomic;work;office;desk;computer;monitor;keyboard;mouse;chair;standing;
+
+Icon=codes.merritt.PostureParrot
+Exec=posture_parrot
+Terminal=false
+StartupWMClass=posture_parrot
