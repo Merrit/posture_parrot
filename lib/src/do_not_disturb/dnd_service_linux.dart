@@ -2,38 +2,16 @@ import 'dart:io';
 
 import 'package:dbus/dbus.dart';
 
+import '../helpers/helpers.dart';
 import '../logs/logging_manager.dart';
-
-enum DesktopEnvironment {
-  gnome,
-  kde,
-  xfce,
-  unknown,
-}
 
 /// A service that monitors the system's Do Not Disturb (DND) status on Linux.
 class DndServiceLinux {
   /// The currently running desktop environment.
-  final DesktopEnvironment _desktopEnvironment = _getDesktopEnvironment();
+  final DesktopEnvironment _desktopEnvironment = getDesktopEnvironment();
 
   DndServiceLinux() {
     log.i('Desktop environment: $_desktopEnvironment');
-  }
-
-  /// Returns the desktop environment.
-  static DesktopEnvironment _getDesktopEnvironment() {
-    final String? xdgCurrentDesktop = Platform.environment['XDG_CURRENT_DESKTOP'];
-
-    switch (xdgCurrentDesktop) {
-      case 'GNOME':
-        return DesktopEnvironment.gnome;
-      case 'KDE':
-        return DesktopEnvironment.kde;
-      case 'XFCE':
-        return DesktopEnvironment.xfce;
-      default:
-        return DesktopEnvironment.unknown;
-    }
   }
 
   /// Returns whether Do Not Disturb is enabled.
