@@ -56,6 +56,7 @@ flutter:
   assets:
     # Add assets from the images directory to the application.
     - assets/icons/
+    - assets/scripts/
 
 flutter_app_builder:
   app_display_name: "Posture Parrot"

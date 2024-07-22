@@ -20,6 +20,9 @@ class BreakTimer {
 
   CountdownTimer _breakTimer = CountdownTimer(Duration.zero, Duration.zero);
   CountdownTimer _intervalTimer = CountdownTimer(Duration.zero, Duration.zero);
+  bool _isPaused = false;
+  Duration _pausedBreakRemaining = Duration.zero;
+  Duration _pausedIntervalRemaining = Duration.zero;
 
   final StreamController<BreakTimerState> _timerStateController = StreamController.broadcast();
   Stream<BreakTimerState> get timerState => _timerStateController.stream;
@@ -28,11 +31,39 @@ class BreakTimer {
   void reset() {
     _breakTimer.cancel();
     _intervalTimer.cancel();
+    _isPaused = false;
+    _pausedBreakRemaining = Duration.zero;
+    _pausedIntervalRemaining = Duration.zero;
     _startIntervalTimer();
   }
 
-  void _startBreakTimer() {
-    _breakTimer = CountdownTimer(breakDuration, const Duration(seconds: 1))
+  void pause() {
+    if (_isPaused) return;
+
+    _breakTimer.cancel();
+    _intervalTimer.cancel();
+    _isPaused = true;
+    // Store remaining time for both timers
+    _pausedBreakRemaining = _breakTimer.remaining;
+    _pausedIntervalRemaining = _intervalTimer.remaining;
+  }
+
+  void resume() {
+    if (!_isPaused) return;
+
+    _isPaused = false;
+    // Resume with the remaining time
+    if (_pausedBreakRemaining > Duration.zero) {
+      _startBreakTimer(_pausedBreakRemaining);
+    } else if (_pausedIntervalRemaining > Duration.zero) {
+      _startIntervalTimer(_pausedIntervalRemaining);
+    }
+    _pausedBreakRemaining = Duration.zero;
+    _pausedIntervalRemaining = Duration.zero;
+  }
+
+  void _startBreakTimer([Duration? remainingTime]) {
+    _breakTimer = CountdownTimer(remainingTime ?? breakDuration, const Duration(seconds: 1))
       ..listen((timer) {
         if (timer.finished) {
           onBreakFinished(this);
@@ -48,8 +79,8 @@ class BreakTimer {
       });
   }
 
-  void _startIntervalTimer() {
-    _intervalTimer = CountdownTimer(breakInterval, const Duration(seconds: 1))
+  void _startIntervalTimer([Duration? remainingTime]) {
+    _intervalTimer = CountdownTimer(remainingTime ?? breakInterval, const Duration(seconds: 1))
       ..listen((timer) {
         if (timer.finished) {
           onIntervalFinished(this);

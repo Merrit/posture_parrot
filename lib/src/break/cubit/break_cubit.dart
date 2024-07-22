@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../do_not_disturb/dnd_service.dart';
+import '../../idle/idle_manager.dart';
 import '../../logs/logging_manager.dart';
 import '../../notifications/notifications.dart';
 import '../../system_tray/system_tray_manager.dart';
@@ -14,12 +15,14 @@ part 'break_cubit.freezed.dart';
 class BreakCubit extends Cubit<BreakState> {
   final AppWindow appWindow;
   final DndService dndService;
+  final IdleManager idleManager;
   final NotificationService notificationService;
   final SystemTrayManager systemTrayManager;
 
   BreakCubit({
     required this.appWindow,
     required this.dndService,
+    required this.idleManager,
     required this.notificationService,
     required this.systemTrayManager,
   }) : super(BreakState.initial()) {
@@ -35,7 +38,11 @@ class BreakCubit extends Cubit<BreakState> {
     );
 
     addBreak(breakTimer);
+
+    idleManager.userIdleState.listen(_onUserStateChanged);
   }
+
+  IdleState _idleState = IdleState.active;
 
   void addBreak(BreakTimer breakTimer) {
     final breaks = [...state.breaks];
@@ -68,6 +75,25 @@ class BreakCubit extends Cubit<BreakState> {
     });
   }
 
+  void _onUserStateChanged(IdleState idleState) {
+    if (_idleState == idleState) return;
+
+    _idleState = idleState;
+
+    if (idleState == IdleState.active) {
+      log.i('User is active. Resuming breaks');
+      for (var breakTimer in state.breaks) {
+        breakTimer.reset();
+      }
+    } else {
+      log.i('User is idle. Pausing breaks');
+      for (var breakTimer in state.breaks) {
+        breakTimer.pause();
+        // TODO: Update the system tray to show that breaks have been paused.
+      }
+    }
+  }
+
   void removeBreak(BreakTimer breakTimer) {
     final breaks = [...state.breaks];
     breaks.remove(breakTimer);
@@ -86,5 +112,11 @@ class BreakCubit extends Cubit<BreakState> {
         'stopping break. starting interval for ${state.activeBreak!.breakInterval.inSeconds} seconds');
     await appWindow.hide();
     emit(state.copyWith(activeBreak: null));
+  }
+
+  @override
+  Future<void> close() async {
+    await idleManager.dispose();
+    return super.close();
   }
 }

@@ -6,6 +6,7 @@ import 'src/app.dart';
 import 'src/break/break.dart';
 import 'src/core/core.dart';
 import 'src/do_not_disturb/dnd_service.dart';
+import 'src/idle/idle_manager.dart';
 import 'src/logs/logging_manager.dart';
 import 'src/notifications/notifications.dart';
 import 'src/settings/settings_controller.dart';
@@ -39,6 +40,7 @@ void main(List<String> args) async {
   // This prevents a sudden theme change when the app is first displayed.
   await settingsController.loadSettings();
 
+  final idleManager = IdleManager();
   final dndService = DndService();
 
   // Run the app and pass in the SettingsController. The app listens to the
@@ -51,6 +53,7 @@ void main(List<String> args) async {
           create: (context) => BreakCubit(
             appWindow: appWindow,
             dndService: dndService,
+            idleManager: idleManager,
             notificationService: notificationService,
             systemTrayManager: systemTrayManager,
           ),
