@@ -59,7 +59,7 @@ class IdleManagerLinuxKDE implements IdleManagerLinux {
     _listenToUserActivity();
 
     _kwin.loadScript(
-      'assets/scripts/kwin-script.js',
+      '${Directory.current.path}/assets/scripts/kwin-script.js',
       _kwinScriptName,
     );
   }
