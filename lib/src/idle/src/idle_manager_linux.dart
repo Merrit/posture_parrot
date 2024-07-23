@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dbus/dbus.dart';
 
 import '../../helpers/helpers.dart';
 import '../../kwin_interface/kwin_interface.dart';
+import '../../logs/logging_manager.dart';
 import '../idle_manager.dart';
 import 'idle_dbus_service.dart';
 
@@ -58,6 +60,8 @@ class IdleManagerLinuxKDE implements IdleManagerLinux {
     _initializeDBusService();
     _listenToUserActivity();
 
+    _listenToScriptOutput();
+
     _kwin.loadScript(
       '${Directory.current.path}/assets/scripts/kwin-script.js',
       _kwinScriptName,
@@ -90,6 +94,12 @@ class IdleManagerLinuxKDE implements IdleManagerLinux {
         _idleState = IdleState.active;
         _userIdleStateController.add(_idleState);
       }
+    });
+  }
+
+  void _listenToScriptOutput() {
+    _kwin.scriptOutput.where((line) => line.contains('posture-parrot-companion')).listen((line) {
+      log.d('KWin script output: $line');
     });
   }
 
