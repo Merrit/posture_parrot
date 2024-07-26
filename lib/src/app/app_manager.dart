@@ -1,27 +1,20 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-import '../../break/break.dart';
-import '../../system_tray/system_tray_manager.dart';
-import '../../window/window.dart';
-
-part 'app_state.dart';
-part 'app_cubit.freezed.dart';
+import '../break/break.dart';
+import '../system_tray/system_tray_manager.dart';
+import '../window/window.dart';
 
 /// Manages the app's state and lifecycle.
-class AppCubit extends Cubit<AppState> {
+class AppManager {
   final AppWindow _appWindow;
   final BreakCubit _breakCubit;
   final SystemTrayManager _systemTrayManager;
 
-  AppCubit({
+  AppManager({
     required AppWindow appWindow,
     required BreakCubit breakCubit,
     required SystemTrayManager systemTrayManager,
   })  : _appWindow = appWindow,
         _breakCubit = breakCubit,
-        _systemTrayManager = systemTrayManager,
-        super(const AppState.initial()) {
+        _systemTrayManager = systemTrayManager {
     _appWindow.events.listen(_onWindowEvent);
     _systemTrayManager.events.listen(_onTrayEvent);
   }

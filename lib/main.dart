@@ -53,7 +53,7 @@ void main(List<String> args) async {
   );
 
   // Create the AppCubit, which manages the app's state.
-  AppCubit(
+  AppManager(
     appWindow: appWindow,
     breakCubit: breakCubit,
     systemTrayManager: systemTrayManager,

@@ -1,1 +1,1 @@
-export 'cubit/cubit.dart';
+export 'app_manager.dart';
