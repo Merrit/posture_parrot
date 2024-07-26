@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-import 'src/app.dart';
 import 'src/app/app.dart';
+import 'src/app_widget.dart';
 import 'src/break/break.dart';
 import 'src/core/core.dart';
 import 'src/do_not_disturb/dnd_service.dart';
@@ -67,7 +67,7 @@ void main(List<String> args) async {
       providers: [
         BlocProvider<BreakCubit>.value(value: breakCubit),
       ],
-      child: App(settingsController: settingsController),
+      child: AppWidget(settingsController: settingsController),
     ),
   );
 }

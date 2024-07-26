@@ -7,8 +7,8 @@ import 'break/view/break_page.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
-class App extends StatefulWidget {
-  const App({
+class AppWidget extends StatefulWidget {
+  const AppWidget({
     super.key,
     required this.settingsController,
   });
@@ -16,10 +16,10 @@ class App extends StatefulWidget {
   final SettingsController settingsController;
 
   @override
-  State<App> createState() => _AppState();
+  State<AppWidget> createState() => _AppWidgetState();
 }
 
-class _AppState extends State<App> with TrayListener {
+class _AppWidgetState extends State<AppWidget> with TrayListener {
   @override
   void initState() {
     trayManager.addListener(this);
