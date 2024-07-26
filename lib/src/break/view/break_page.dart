@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../break.dart';
 
-/// Displays a list of SampleItems.
+/// The view that shows the active break.
 class BreakView extends StatelessWidget {
   const BreakView({
     super.key,
@@ -13,6 +13,47 @@ class BreakView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const Widget breakTimeText = Text(
+      'Break Time',
+      style: TextStyle(
+        fontSize: 40,
+        color: Colors.white,
+      ),
+    );
+
+    final timerText = BlocBuilder<BreakCubit, BreakState>(
+      builder: (context, state) {
+        const timerTextStyle = TextStyle(
+          fontSize: 40,
+          color: Colors.white,
+        );
+
+        if (state.activeBreak == null) {
+          // This should only happen during debugging, to check the design.
+          return const Text(
+            'No active break',
+            style: timerTextStyle,
+          );
+        }
+
+        return StreamBuilder<BreakTimerState>(
+          stream: state.activeBreak!.timerState,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const SizedBox();
+            }
+
+            final timerState = snapshot.data!;
+
+            return Text(
+              '${timerState.remainingTime.inMinutes}:${(timerState.remainingTime.inSeconds % 60).toString().padLeft(2, '0')}',
+              style: timerTextStyle,
+            );
+          },
+        );
+      },
+    );
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
@@ -25,39 +66,8 @@ class BreakView extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Break Time',
-                    style: TextStyle(
-                      fontSize: 30,
-                      color: Colors.white,
-                    ),
-                  ),
-                  BlocBuilder<BreakCubit, BreakState>(
-                    builder: (context, state) {
-                      if (state.activeBreak == null) {
-                        return const SizedBox();
-                      }
-
-                      return StreamBuilder<BreakTimerState>(
-                        stream: state.activeBreak!.timerState,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const SizedBox();
-                          }
-
-                          final timerState = snapshot.data!;
-
-                          return Text(
-                            '${timerState.remainingTime.inMinutes}:${(timerState.remainingTime.inSeconds % 60).toString().padLeft(2, '0')}',
-                            style: const TextStyle(
-                              fontSize: 40,
-                              color: Colors.white,
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+                  breakTimeText,
+                  timerText,
                 ],
               ),
             ),
