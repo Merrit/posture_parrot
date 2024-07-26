@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'src/app.dart';
+import 'src/app/app.dart';
 import 'src/break/break.dart';
 import 'src/core/core.dart';
 import 'src/do_not_disturb/dnd_service.dart';
@@ -26,10 +27,10 @@ void main(List<String> args) async {
     flutterLocalNotificationsPlugin: FlutterLocalNotificationsPlugin(),
   );
 
-  const appWindow = AppWindow();
+  final appWindow = AppWindow();
   await appWindow.initialize();
 
-  final systemTrayManager = SystemTrayManager(appWindow: appWindow);
+  final systemTrayManager = SystemTrayManager();
   await systemTrayManager.ensureInitialized();
 
   // Set up the SettingsController, which will glue user settings to multiple
@@ -43,22 +44,28 @@ void main(List<String> args) async {
   final idleManager = IdleManager();
   final dndService = DndService();
 
+  final breakCubit = BreakCubit(
+    appWindow: appWindow,
+    dndService: dndService,
+    idleManager: idleManager,
+    notificationService: notificationService,
+    systemTrayManager: systemTrayManager,
+  );
+
+  // Create the AppCubit, which manages the app's state.
+  AppCubit(
+    appWindow: appWindow,
+    breakCubit: breakCubit,
+    systemTrayManager: systemTrayManager,
+  );
+
   // Run the app and pass in the SettingsController. The app listens to the
   // SettingsController for changes, then passes it further down to the
   // SettingsView.
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider<BreakCubit>(
-          create: (context) => BreakCubit(
-            appWindow: appWindow,
-            dndService: dndService,
-            idleManager: idleManager,
-            notificationService: notificationService,
-            systemTrayManager: systemTrayManager,
-          ),
-          lazy: false,
-        ),
+        BlocProvider<BreakCubit>.value(value: breakCubit),
       ],
       child: App(settingsController: settingsController),
     ),

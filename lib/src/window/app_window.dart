@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -7,9 +8,11 @@ import 'package:window_size/window_size.dart' as window_size;
 
 import '../logs/logging_manager.dart';
 
-class AppWindow {
-  const AppWindow();
+enum WindowEvent {
+  close,
+}
 
+class AppWindow with WindowListener {
   Future<void> initialize() async {
     await windowManager.ensureInitialized();
 
@@ -26,16 +29,39 @@ class AppWindow {
       await windowManager.setSkipTaskbar(true);
       await _maximize();
     });
+
+    windowManager.addListener(this);
+    await windowManager.setPreventClose(true);
   }
 
   Future<void> center() async => await windowManager.center();
 
-  void close() => exit(0);
+  void close() {
+    dispose();
+    exit(0);
+  }
+
+  void dispose() => windowManager.removeListener(this);
 
   /// Focuses the window.
   Future<void> focus() async => await windowManager.focus();
 
   Future<void> hide() async => await windowManager.hide();
+
+  Stream<WindowEvent> get events => _windowEventController.stream;
+
+  final StreamController<WindowEvent> _windowEventController =
+      StreamController<WindowEvent>.broadcast();
+
+  @override
+  void onWindowEvent(String eventName) {
+    log.d('Window event: $eventName');
+
+    switch (eventName) {
+      case 'close':
+        _windowEventController.add(WindowEvent.close);
+    }
+  }
 
   /// Sets whether the window should be always on bottom.
   Future<void> setAlwaysOnBottom(bool alwaysOnBottom) async {

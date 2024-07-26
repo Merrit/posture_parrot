@@ -1,16 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:tray_manager/tray_manager.dart';
 
 import '../core/core.dart';
-import '../window/window.dart';
+
+enum TrayEvent {
+  exitApp,
+  toggleVisibility,
+}
 
 /// Manages the system tray icon.
 class SystemTrayManager {
-  final AppWindow _window;
-
-  SystemTrayManager({
-    required AppWindow appWindow,
-  }) : _window = appWindow;
+  Menu _menu = Menu();
 
   Future<void> ensureInitialized() async {
     final String iconPath = AppIcons.platformSpecific();
@@ -19,7 +21,7 @@ class SystemTrayManager {
 
     _menu = Menu(
       items: [
-        MenuItem(label: 'Exit', onClick: (menuItem) => _window.close()),
+        MenuItem(label: 'Exit', onClick: (menuItem) => _trayEventController.add(TrayEvent.exitApp)),
       ],
     );
 
@@ -30,7 +32,7 @@ class SystemTrayManager {
         MenuItem(
           label: 'Debug: Toggle Visible',
           onClick: (menuItem) async {
-            await _window.toggleVisible();
+            _trayEventController.add(TrayEvent.toggleVisibility);
           },
         ),
       );
@@ -39,7 +41,9 @@ class SystemTrayManager {
     await trayManager.setContextMenu(_menu);
   }
 
-  Menu _menu = Menu();
+  Stream<TrayEvent> get events => _trayEventController.stream;
+
+  final StreamController<TrayEvent> _trayEventController = StreamController<TrayEvent>.broadcast();
 
   /// Sets the system tray icon.
   Future<void> setIcon(String iconPath) async {
