@@ -89,7 +89,7 @@ class BreakCubit extends Cubit<BreakState> {
       log.i('User is idle. Pausing breaks');
       for (var breakTimer in state.breaks) {
         breakTimer.pause();
-        // TODO: Update the system tray to show that breaks have been paused.
+        systemTrayManager.updateTimeRemaining(Duration.zero);
       }
     }
   }

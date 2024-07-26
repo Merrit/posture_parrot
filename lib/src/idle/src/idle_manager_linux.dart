@@ -105,7 +105,6 @@ class IdleManagerLinuxKDE implements IdleManagerLinux {
 
   @override
   Future<void> dispose() async {
-    // TODO: make sure this is disposed before the app closes.
     await _idleDbusManager.dispose();
     await dbusClient.close();
     _activityCheckTimer?.cancel();

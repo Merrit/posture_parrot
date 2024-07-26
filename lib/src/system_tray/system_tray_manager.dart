@@ -54,14 +54,25 @@ class SystemTrayManager {
     /// If `_menu` already has an item with a label that contains 'Next Break:', remove it.
     _menu.items?.removeWhere((element) => element.label?.contains('Next Break:') ?? false);
 
-    _menu.items?.insert(
-      0,
-      MenuItem(
-        key: timeRemaining.inSeconds.toString(),
-        label: 'Next Break: ${timeRemaining.asString}',
-        onClick: (menuItem) => _window.show(),
-      ),
-    );
+    if (timeRemaining == Duration.zero) {
+      _menu.items?.insert(
+        0,
+        MenuItem(
+          key: 'breaksPaused',
+          label: 'Breaks Paused: Idle Detected',
+        ),
+      );
+    } else {
+      _menu.items?.removeWhere((element) => element.key == 'breaksPaused');
+
+      _menu.items?.insert(
+        0,
+        MenuItem(
+          key: timeRemaining.inSeconds.toString(),
+          label: 'Next Break: ${timeRemaining.asString}',
+        ),
+      );
+    }
 
     await trayManager.setContextMenu(_menu);
   }
