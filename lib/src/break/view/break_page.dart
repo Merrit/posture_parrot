@@ -46,7 +46,7 @@ class BreakView extends StatelessWidget {
             final timerState = snapshot.data!;
 
             return Text(
-              '${timerState.remainingTime.inMinutes}:${(timerState.remainingTime.inSeconds % 60).toString().padLeft(2, '0')}',
+              '${timerState.remainingBreakTime.inMinutes}:${(timerState.remainingBreakTime.inSeconds % 60).toString().padLeft(2, '0')}',
               style: timerTextStyle,
             );
           },
@@ -68,12 +68,47 @@ class BreakView extends StatelessWidget {
                 children: [
                   breakTimeText,
                   timerText,
+                  const SizedBox(height: 16),
+                  _BreakControls(),
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _BreakControls extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BreakCubit, BreakState>(
+      builder: (context, state) {
+        // SingleChildScrollView prevents overflow error when the screen is too small, and when
+        // the app is first starting.
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  context.read<BreakCubit>().postponeBreak();
+                },
+                child: const Text('Postpone'),
+              ),
+              const SizedBox(width: 16),
+              ElevatedButton(
+                onPressed: () {
+                  context.read<BreakCubit>().skipBreak();
+                },
+                child: const Text('Skip'),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

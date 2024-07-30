@@ -55,9 +55,9 @@ class BreakCubit extends Cubit<BreakState> {
     breakTimer.timerState.listen((timerState) async {
       if (!timerState.isIntervalActive) return;
 
-      systemTrayManager.updateTimeRemaining(timerState.remainingTime);
+      systemTrayManager.updateTimeRemaining(timerState.remainingIntervalTime);
 
-      if (timerState.remainingTime.inSeconds != 10) return;
+      if (timerState.remainingIntervalTime.inSeconds != 10) return;
 
       final dndEnabled = await dndService.isDndEnabled();
 
@@ -93,6 +93,21 @@ class BreakCubit extends Cubit<BreakState> {
       }
     }
   }
+
+  /// Postpones the currently active break by 5 minutes.
+  void postponeBreak() {
+    final activeBreak = state.activeBreak;
+    if (activeBreak == null) return;
+
+    stopBreak();
+
+    state.breaks
+        .singleWhere((element) => element == activeBreak)
+        .postpone(const Duration(minutes: 5));
+  }
+
+  /// Skips the currently active break and starts the next interval.
+  void skipBreak() {}
 
   void removeBreak(BreakTimer breakTimer) {
     final breaks = [...state.breaks];

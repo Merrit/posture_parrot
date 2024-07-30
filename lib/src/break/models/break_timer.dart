@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:quiver/async.dart';
+
+part 'break_timer.freezed.dart';
 
 class BreakTimer {
   final Duration breakDuration;
@@ -20,9 +23,9 @@ class BreakTimer {
 
   CountdownTimer _breakTimer = CountdownTimer(Duration.zero, Duration.zero);
   CountdownTimer _intervalTimer = CountdownTimer(Duration.zero, Duration.zero);
-  bool _isPaused = false;
-  Duration _pausedBreakRemaining = Duration.zero;
-  Duration _pausedIntervalRemaining = Duration.zero;
+  bool isPaused = false;
+  Duration breakRemaining = Duration.zero;
+  Duration intervalRemaining = Duration.zero;
 
   final StreamController<BreakTimerState> _timerStateController = StreamController.broadcast();
   Stream<BreakTimerState> get timerState => _timerStateController.stream;
@@ -31,40 +34,58 @@ class BreakTimer {
   void reset() {
     _breakTimer.cancel();
     _intervalTimer.cancel();
-    _isPaused = false;
-    _pausedBreakRemaining = Duration.zero;
-    _pausedIntervalRemaining = Duration.zero;
+    isPaused = false;
+    breakRemaining = Duration.zero;
+    intervalRemaining = Duration.zero;
     _startIntervalTimer();
   }
 
   void pause() {
-    if (_isPaused) return;
+    if (isPaused) return;
 
     _breakTimer.cancel();
     _intervalTimer.cancel();
-    _isPaused = true;
+    isPaused = true;
     // Store remaining time for both timers
-    _pausedBreakRemaining = _breakTimer.remaining;
-    _pausedIntervalRemaining = _intervalTimer.remaining;
+    breakRemaining = _breakTimer.remaining;
+    intervalRemaining = _intervalTimer.remaining;
+  }
+
+  void postpone(Duration duration) {
+    if (_breakTimer.remaining > Duration.zero) {
+      // If the break timer is active, stop it and start an interval timer with the postponed time
+      _breakTimer.cancel();
+      _intervalTimer.cancel();
+      breakRemaining = Duration.zero;
+      _startIntervalTimer(duration);
+    } else {
+      // If the break timer is not active, add the postponed time to the interval timer
+      // TODO: Verify this logic actually works to extend the interval timer. When we add a button
+      // to postpone the upcoming break from the notifiation maybe?
+      _intervalTimer.cancel();
+      _startIntervalTimer(_intervalTimer.remaining + duration);
+    }
   }
 
   void resume() {
-    if (!_isPaused) return;
+    if (!isPaused) return;
 
-    _isPaused = false;
+    isPaused = false;
     // Resume with the remaining time
-    if (_pausedBreakRemaining > Duration.zero) {
-      _startBreakTimer(_pausedBreakRemaining);
-    } else if (_pausedIntervalRemaining > Duration.zero) {
-      _startIntervalTimer(_pausedIntervalRemaining);
+    if (breakRemaining > Duration.zero) {
+      _startBreakTimer(breakRemaining);
+    } else if (intervalRemaining > Duration.zero) {
+      _startIntervalTimer(intervalRemaining);
     }
-    _pausedBreakRemaining = Duration.zero;
-    _pausedIntervalRemaining = Duration.zero;
+    breakRemaining = Duration.zero;
+    intervalRemaining = Duration.zero;
   }
 
   void _startBreakTimer([Duration? remainingTime]) {
     _breakTimer = CountdownTimer(remainingTime ?? breakDuration, const Duration(seconds: 1))
       ..listen((timer) {
+        breakRemaining = timer.remaining;
+
         if (timer.finished) {
           onBreakFinished(this);
           _startIntervalTimer();
@@ -74,14 +95,19 @@ class BreakTimer {
         _timerStateController.add(BreakTimerState(
           isBreakActive: true,
           isIntervalActive: false,
-          remainingTime: timer.remaining,
+          remainingBreakTime: timer.remaining,
+          remainingIntervalTime: _intervalTimer.remaining,
         ));
       });
   }
 
   void _startIntervalTimer([Duration? remainingTime]) {
+    _intervalTimer.cancel();
+
     _intervalTimer = CountdownTimer(remainingTime ?? breakInterval, const Duration(seconds: 1))
       ..listen((timer) {
+        intervalRemaining = timer.remaining;
+
         if (timer.finished) {
           onIntervalFinished(this);
           _startBreakTimer();
@@ -91,7 +117,8 @@ class BreakTimer {
         _timerStateController.add(BreakTimerState(
           isBreakActive: false,
           isIntervalActive: true,
-          remainingTime: timer.remaining,
+          remainingBreakTime: _breakTimer.remaining,
+          remainingIntervalTime: timer.remaining,
         ));
       });
   }
@@ -103,20 +130,22 @@ class BreakTimer {
   }
 }
 
-class BreakTimerState {
-  final bool isBreakActive;
-  final bool isIntervalActive;
-  final Duration remainingTime;
+@freezed
+class BreakTimerState with _$BreakTimerState {
+  const factory BreakTimerState({
+    required bool isBreakActive,
+    required bool isIntervalActive,
+    required Duration remainingBreakTime,
+    required Duration remainingIntervalTime,
+  }) = _BreakTimerState;
 
-  BreakTimerState({
-    required this.isBreakActive,
-    required this.isIntervalActive,
-    required this.remainingTime,
-  });
-
-  @override
-  String toString() {
-    return 'BreakTimerState(isBreakActive: $isBreakActive, isIntervalActive: $isIntervalActive, remainingTime: ${remainingTime.inSeconds})';
+  factory BreakTimerState.initial() {
+    return const BreakTimerState(
+      isBreakActive: false,
+      isIntervalActive: false,
+      remainingBreakTime: Duration.zero,
+      remainingIntervalTime: Duration.zero,
+    );
   }
 }
 
