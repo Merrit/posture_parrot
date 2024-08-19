@@ -48,8 +48,7 @@ static void my_application_activate(GApplication* application) {
   }
 
   gtk_window_set_default_size(window, 1280, 720);
-  // gtk_widget_show(GTK_WIDGET(window)); // Don't show the window until called by Flutter.
-  gtk_widget_realize(GTK_WIDGET(window));
+  gtk_widget_show(GTK_WIDGET(window));
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
   fl_dart_project_set_dart_entrypoint_arguments(project, self->dart_entrypoint_arguments);
@@ -59,6 +58,10 @@ static void my_application_activate(GApplication* application) {
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
+
+  // Immediately hide the window once it has been initialized.
+  // This allows the Dart code to show the window when it is ready.
+  gtk_widget_hide(GTK_WIDGET(window));
 
   gtk_widget_grab_focus(GTK_WIDGET(view));
 }
