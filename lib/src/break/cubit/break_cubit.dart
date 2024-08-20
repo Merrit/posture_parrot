@@ -107,7 +107,13 @@ class BreakCubit extends Cubit<BreakState> {
   }
 
   /// Skips the currently active break and starts the next interval.
-  void skipBreak() {}
+  void skipBreak() {
+    final activeBreak = state.activeBreak;
+    if (activeBreak == null) return;
+
+    stopBreak();
+    activeBreak.reset();
+  }
 
   void removeBreak(BreakTimer breakTimer) {
     final breaks = [...state.breaks];
